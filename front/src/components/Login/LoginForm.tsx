@@ -18,6 +18,12 @@ const LoginForm: React.FC = () => {
             })
             .catch((error)=> {
                 console.log(error);
+                if (error.response.status == 400) {
+                    alert("Wrong password.");
+                }
+                if (error.response.status == 404) {
+                    alert("Username does not exist.");
+                }
             })
 
     };

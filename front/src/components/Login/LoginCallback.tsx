@@ -9,7 +9,7 @@ const LoginCallback: React.FC = () => {
   const { code, state } = querystring.parse(
     query[0] === '?' ? query.slice(1) : query
   );
-  const [valid, setValid] = useState<boolean | null>(null);
+  const [valid, setValid] = useState<boolean>(false);
   const data = {
     code: code,
     state: state,

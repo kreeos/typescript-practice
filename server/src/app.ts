@@ -70,7 +70,9 @@ app.post("/api/login", (req: express.Request, res: express.Response, next:expres
   const id: string = req.body.id;
   const password: string = req.body.password
   const retrievePasswordQuery = "SELECT password FROM user WHERE username='"+id+"'";
-
+  const jwtObj = {
+    username: id,
+  }; 
   pool.query<mysql.RowDataPacket[]>(retrievePasswordQuery)
   .then(([rows, fields]) => {
     if (rows.length) {
@@ -78,9 +80,6 @@ app.post("/api/login", (req: express.Request, res: express.Response, next:expres
       bcrypt.compare(password, savedHash, function(err, result) {
         if (result) {
           //successfully logged in
-          const jwtObj = {
-            username: id,
-          }; 
           jwt.sign(jwtObj, jwt_secret, {
             expiresIn: '10m'
           }, (
