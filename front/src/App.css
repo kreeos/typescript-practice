@@ -1,0 +1,94 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+input[type=submit]{
+  background-color: #F2A024;
+  border: 1px solid #FFFFFF;
+  color: white;
+}
+
+input[type=submit]:focus {
+  box-shadow: 0 0 0 0.2rem #F2A024 !important;
+  color: white;
+}
+
+input[type=submit]:active {
+  background-color: #F2A024 !important;
+  border: 1px solid #FFFFFF !important;
+  color: white;
+}
+
+input[type=submit]:hover {
+  background-color: #FFFFFF;
+  border: 1px solid #F2A024;
+  color: #F2A024;
+}
+
+.error-msg {
+  color: red;
+}
+
+.error-msg:hover {
+  color: red;
+  text-decoration: none;
+}
+
+.btn-register {
+  background-color: #FFFFFF !important;
+  border: 1px solid #F2A024 !important;
+  color: #F2A024 !important;
+  margin-top: 10px;
+}
+
+.btn-register:hover {
+  background-color: #F2A024 !important;
+  border: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+.btn-register:focus {
+  box-shadow: 0 0 0 0.2rem #FFFFFF !important;
+  color: white;
+}
+
+.btn-register:active {
+  background-color: #F2A024 !important;
+  border: 1px solid #FFFFFF !important;
+  color: white;
+}
