@@ -30,7 +30,6 @@ app.use (cors({
   origin: ["http://127.0.0.1:4000","http://localhost:4000"],
   credentials: true,
   methods:['GET','POST'],
-  exposedHeaders: ['set-cookie']
 }));
 
 app.use(
