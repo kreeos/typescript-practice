@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import redis from 'redis';
 import cors from 'cors';
 import * as mysql from 'mysql2/promise';
+import cookieParser from 'cookie-parser';
 
 
 const RedisStore = require('connect-redis')(session)
@@ -31,6 +32,7 @@ app.use (cors({
   credentials: true,
   methods:['GET','POST'],
 }));
+app.use(cookieParser());
 
 app.use(
   session({
@@ -54,6 +56,27 @@ const poolConfig:mysql.PoolOptions = {
 
 const pool:mysql.Pool = mysql.createPool(poolConfig);
 
+const sampleTask = () => {
+  console.log("Here");
+}
+const verifyToken = (req: express.Request, res:express.Response, next: express.NextFunction) => {
+  try {
+    console.log(req.cookies);
+    const clientToken: string = req.cookies.user;
+    const decoded: string | object = jwt.verify(clientToken, jwt_secret);
+  
+    console.log(decoded);
+    if (typeof decoded === 'object' &&  decoded !== null) {
+      console.log("cookie came in");
+      console.log(decoded);    
+      next();
+    }
+  }catch (error) {
+    console.log('cookie error');
+    console.log(error);
+    res.status(401).json({error: "Some error"});
+  }
+};
 
 app.get("/", (req: express.Request, res: express.Response, next: express.NextFunction) =>{
   res.send("Hello TS express!!");
@@ -107,6 +130,8 @@ app.post("/api/login", (req: express.Request, res: express.Response, next:expres
     console.log(error);
   });
 })
+
+app.get("/api/verifyToken", verifyToken, sampleTask);
 
 app.get("/api/checkDuplicate", (req:express.Request, res: express.Response, next:express.NextFunction) => {
   const inputId = req.query.id;

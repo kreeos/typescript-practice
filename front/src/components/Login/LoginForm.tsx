@@ -15,6 +15,13 @@ const LoginForm: React.FC = () => {
             .then((response)=> {
                 alert("logged in!");
                 console.log(response);
+                biseoAxios.get(baseUrl+"/verifyToken").
+                then((response)=> {
+                    console.log(response);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
             })
             .catch((error)=> {
                 console.log(error);
