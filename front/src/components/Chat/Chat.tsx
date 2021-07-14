@@ -1,42 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import LoginForm from '../Login/LoginForm';
-import Chat from '../Chat';
-import './home.css';
 import { biseoAxios } from '../../lib/biseoAxios';
+import LogoutButton from '../Login/LogoutButton';
+import './chat.css';
 const devUrl = "http://localhost:9000/api"
 // const devUrl = undefined;
 const baseUrl: string = devUrl ?? "";
 
-const Home: React.FC = () => {
+interface ChatUsernameProps {
+  username: string | undefined;
+}
+
+const Chat: React.FC<ChatUsernameProps> = props => {
     const [isLoggedIn, setLoggedIn] = useState(false);
 
     useEffect(() => {
+        console.log(props);
+        // console.log(props);
         biseoAxios.get(baseUrl+"/verifyToken").
         then((response)=> {
             console.log(response);
             if (response.status == 200) {
                 setLoggedIn(true);
+
             }
         })
         .catch((error) => {
-            console.log(error);
+            alert("Please Log in first.");
+            window.location.href = "/";
         });
     });
 
     return (
-        <div className="home">
-            {
-            isLoggedIn ?
-            <div>
-                <Chat username={undefined}/>
-            </div>
-            :   
-            <div className="form-container">
-                <LoginForm/>
-            </div>
-            }
+        <div className="chat">
+          <h1>Welcome, {props.username}</h1>
+          <LogoutButton/>
         </div>
     )
 };
 
-export default Home;
+export default Chat;

@@ -92,3 +92,8 @@ input[type=submit]:hover {
   border: 1px solid #FFFFFF !important;
   color: white;
 }
+
+.link-invisible {
+  display: none;
+  visibility: hidden;
+}

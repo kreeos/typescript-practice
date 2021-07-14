@@ -7,7 +7,7 @@ import redis from 'redis';
 import cors from 'cors';
 import * as mysql from 'mysql2/promise';
 import cookieParser from 'cookie-parser';
-
+import https from 'https';
 
 const RedisStore = require('connect-redis')(session)
 const redisClient = redis.createClient()
@@ -17,7 +17,6 @@ declare module 'express-session' {
     state: string;
   }
 }
-
 
 const app: express.Application = express();
 const API_PORT: number = 9000;
@@ -56,9 +55,11 @@ const poolConfig:mysql.PoolOptions = {
 
 const pool:mysql.Pool = mysql.createPool(poolConfig);
 
-const sampleTask = () => {
+const sampleCheck = (req: express.Request, res:express.Response, next: express.NextFunction) => {
   console.log("Here");
+  res.status(200).json({message: "token verified"});
 }
+
 const verifyToken = (req: express.Request, res:express.Response, next: express.NextFunction) => {
   try {
     console.log(req.cookies);
@@ -68,7 +69,7 @@ const verifyToken = (req: express.Request, res:express.Response, next: express.N
     console.log(decoded);
     if (typeof decoded === 'object' &&  decoded !== null) {
       console.log("cookie came in");
-      console.log(decoded);    
+      console.log(decoded);
       next();
     }
   }catch (error) {
@@ -114,7 +115,7 @@ app.post("/api/login", (req: express.Request, res: express.Response, next:expres
               return;
             }
             res.cookie("user", token);
-            res.status(200).json({message: "Successfully Logged In", token: token});
+            res.status(200).json({message: "Successfully Logged In", token: token, user: id});
           });
         }
         else {
@@ -131,7 +132,14 @@ app.post("/api/login", (req: express.Request, res: express.Response, next:expres
   });
 })
 
-app.get("/api/verifyToken", verifyToken, sampleTask);
+app.get("/api/logout", (req: express.Request, res: express.Response, next:express.NextFunction) => {
+  if (res.cookie) {
+    res.cookie("user", "");
+  }
+  res.status(200).send();
+})
+
+app.get("/api/verifyToken", verifyToken, sampleCheck);
 
 app.get("/api/checkDuplicate", (req:express.Request, res: express.Response, next:express.NextFunction) => {
   const inputId = req.query.id;
@@ -165,6 +173,25 @@ app.post("/api/register", (req: express.Request, res: express.Response, next:exp
     }).catch((error)=> {
       console.log(error.code);
     });
+  });
+})
+
+app.get("/api/getUserInfo", (req:express.Request, res: express.Response, next:express.NextFunction) => {
+  const inputId = req.query.id;
+
+  const checkDupQuery = "SELECT * FROM user WHERE username='"+inputId+"'";
+  
+  pool.query<mysql.RowDataPacket[]>(checkDupQuery)
+  .then(([rows, fields]) => {
+    if (rows.length) {
+      res.json(rows);
+    }
+    else {
+      res.status(404).json({error: "User not found."});
+    }
+  }).catch(error => {
+    res.status(500).json({error: "Unknown internal error."});
+    console.log(error);
   });
 })
 

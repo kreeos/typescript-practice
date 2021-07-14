@@ -5,6 +5,7 @@ import {
   Link
 } from 'react-router-dom';
 import './App.css';
+import Chat from './components/Chat';
 import Home from './components/Home';
 import Register from './components/Register';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -21,9 +22,9 @@ const App: React.FC = () =>{
             <li>
               <Link to="/register">Register</Link>
             </li>
-            {/* <li>
-              <Link to="/users">Users</Link>
-            </li> */}
+            <li>
+              <Link to="/chat">Chat</Link>
+            </li>
           </ul>
         </nav>
         <Switch>
@@ -38,6 +39,9 @@ const App: React.FC = () =>{
           </Route>
           <Route exact path="/register">
             <Register />
+          </Route>
+          <Route exact path="/chat">
+            <Chat username={undefined}/>
           </Route>
         </Switch>
       </div>
