@@ -1,5 +1,4 @@
 import express from "express";
-import "./utils/env";
 import session from 'express-session';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -8,7 +7,9 @@ import cors from 'cors';
 import * as mysql from 'mysql2/promise';
 import cookieParser from 'cookie-parser';
 import https from 'https';
+import "./utils/env";
 
+const socket = require('socket.io');
 const RedisStore = require('connect-redis')(session)
 const redisClient = redis.createClient()
 
@@ -22,6 +23,24 @@ const app: express.Application = express();
 const API_PORT: number = 9000;
 const saltRounds: number = 10;
 const jwt_secret: string = process.env.JWT_SECRET ? process.env.JWT_SECRET : "devsecret";
+let http = require("http").Server(app);
+const io = socket(http);
+
+const server = http.listen(3000, function() {
+  console.log("listening on *:3000");
+});
+
+io.on('connection', (socket: any) => {
+  console.log('a user is connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+
+  socket.on("message", function(message: any) {
+    console.log(message);
+    socket.emit("message", message);
+  });
+});
 
 // Middleware setting
 app.use(express.urlencoded({ extended: true }))
@@ -55,6 +74,12 @@ const poolConfig:mysql.PoolOptions = {
 
 const pool:mysql.Pool = mysql.createPool(poolConfig);
 
+app.listen(API_PORT, ()=> {
+  console.log("API server runnning at ", API_PORT);
+})
+
+// server.listen(API_por)
+
 const sampleCheck = (req: express.Request, res:express.Response, next: express.NextFunction) => {
   console.log("Here");
   res.status(200).json({message: "token verified"});
@@ -84,9 +109,6 @@ app.get("/", (req: express.Request, res: express.Response, next: express.NextFun
 });
 
 
-app.listen(API_PORT, ()=> {
-  console.log("API server runnning at ", API_PORT);
-})
 
 app.post("/api/login", (req: express.Request, res: express.Response, next:express.NextFunction) => {
   // console.log("Login!");
