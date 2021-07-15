@@ -12,38 +12,55 @@ interface ChatUsernameProps {
 }
 
 const Chat: React.FC<ChatUsernameProps> = props => {
-    const [isLoggedIn, setLoggedIn] = useState(false);
-
-    useEffect(() => {
-        console.log(props);
-        // console.log(props);
-        biseoAxios.get(baseUrl+"/verifyToken").
-        then((response)=> {
-            console.log(response);
-            if (response.status == 200) {
-                setLoggedIn(true);
-
-            }
-        })
-        .catch((error) => {
-            alert("Please Log in first.");
-            window.location.href = "/";
-        });
-    });
+    const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
+    const [chatMessage, setChatMessage] = useState<string>("");
     const socket = io("http://localhost:3000");
 
-    socket.on("message", function(message: any) {
-        alert(message);
-    })
+    useEffect(() => {
+        // console.log(props);
+        if (!isLoggedIn) {
+            biseoAxios.get(baseUrl+"/verifyToken").
+            then((response)=> {
+                console.log(response);
+                if (response.status == 200) {
+                    setLoggedIn(true);
     
+                }
+            })
+            .catch((error) => {
+                alert("Please Log in first.");
+                window.location.href = "/";
+            })
+            .finally(() => {
+                socket.emit("user", props.username);
+            });
+        }
+    });
+
     const sendMsg = () => {
-        socket.emit("message", "HELLO WORLD");
+        socket.emit("message", chatMessage);
     }
+
+    const handleChange = (event:any) => {
+        setChatMessage(event.target.value);
+        console.log(chatMessage);
+    }
+
+    socket.on("message", function(message: any) {
+        // alert(message);
+        console.log(message);
+    })
+
+    socket.on("entrance", function(message: any) {
+        // alert(message);
+        console.log(message);
+    })
 
     return (
         <div className="chat">
             <h1>Welcome, {props.username}</h1>
-            <button onClick={sendMsg}>Hit Me</button>
+            <input onChange={handleChange}></input>
+            <button onClick={sendMsg}>Send</button>
 
             <LogoutButton/>
         </div>

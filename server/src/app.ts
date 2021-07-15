@@ -40,6 +40,12 @@ io.on('connection', (socket: any) => {
     console.log(message);
     socket.emit("message", message);
   });
+
+  socket.on("user", function(user: any) {
+    console.log(user);
+    const message = user + " has entered.";
+    socket.broadcast.emit("entrance", message);
+  });
 });
 
 // Middleware setting
