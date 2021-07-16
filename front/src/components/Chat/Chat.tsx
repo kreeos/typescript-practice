@@ -1,5 +1,6 @@
 import React, { useState, useEffect, MouseEventHandler } from 'react';
 import { biseoAxios } from '../../lib/biseoAxios';
+import { SOCKET_URL } from '../../lib/config';
 import LogoutButton from '../Login/LogoutButton';
 import io from "socket.io-client";
 import './chat.css';
@@ -11,20 +12,29 @@ interface ChatUsernameProps {
   username: string | undefined;
 }
 
+const socket =  io(SOCKET_URL);
+
 const Chat: React.FC<ChatUsernameProps> = props => {
     const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
     const [chatMessage, setChatMessage] = useState<string>("");
-    const socket = io("http://localhost:3000");
+    const [chats, setChats] = useState<{user: string, message: string}[]>([]);
+    const [username, setUsername] = useState<string>("");
+
+    const handleChange = (event:any) => {
+        setChatMessage(event.target.value);
+        console.log(chatMessage);
+    }
 
     useEffect(() => {
-        // console.log(props);
+        setUsername(props.username == undefined ? "" : props.username);
+ 
         if (!isLoggedIn) {
             biseoAxios.get(baseUrl+"/verifyToken").
             then((response)=> {
                 console.log(response);
                 if (response.status == 200) {
                     setLoggedIn(true);
-    
+                    socket.emit("user", props.username);
                 }
             })
             .catch((error) => {
@@ -32,36 +42,50 @@ const Chat: React.FC<ChatUsernameProps> = props => {
                 window.location.href = "/";
             })
             .finally(() => {
-                socket.emit("user", props.username);
             });
+        }
+        else {
         }
     });
 
     const sendMsg = () => {
-        socket.emit("message", chatMessage);
-    }
-
-    const handleChange = (event:any) => {
-        setChatMessage(event.target.value);
-        console.log(chatMessage);
+        socket.emit("message", {user: username, message: chatMessage});
+        setChatMessage("");
     }
 
     socket.on("message", function(message: any) {
-        // alert(message);
         console.log(message);
     })
 
+    socket.on('message',({user,message})=>{
+        setChats([...chats,{user, message}])
+    })
+    
     socket.on("entrance", function(message: any) {
-        // alert(message);
         console.log(message);
     })
+
+    const renderChat =()=>{
+        return chats.map(({user, message},index)=>(
+          <div key={index}>
+            <h3>{user}:<span>{message}</span></h3>
+          </div>
+        ))
+      }
 
     return (
         <div className="chat">
             <h1>Welcome, {props.username}</h1>
-            <input onChange={handleChange}></input>
-            <button onClick={sendMsg}>Send</button>
-
+            <div>
+                <h1>Messages</h1>
+                {
+                    renderChat()
+                }
+            </div>
+            <div>
+                <input onChange={handleChange} value={chatMessage}></input>
+                <button onClick={sendMsg}>Send</button>
+            </div>
             <LogoutButton/>
         </div>
     )

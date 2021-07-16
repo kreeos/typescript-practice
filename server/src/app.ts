@@ -8,6 +8,7 @@ import * as mysql from 'mysql2/promise';
 import cookieParser from 'cookie-parser';
 import https from 'https';
 import "./utils/env";
+import internal from "stream";
 
 const socket = require('socket.io');
 const RedisStore = require('connect-redis')(session)
@@ -17,6 +18,12 @@ declare module 'express-session' {
   export interface SessionData {
     state: string;
   }
+}
+
+export interface tokenObject {
+  username: string,
+  iat: number,
+  exp: number,
 }
 
 const app: express.Application = express();
@@ -32,19 +39,21 @@ const server = http.listen(3000, function() {
 
 io.on('connection', (socket: any) => {
   console.log('a user is connected');
+  console.log(socket.id);
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
 
-  socket.on("message", function(message: any) {
+  socket.on("message", function(message: {user: string, message: string}) {
     console.log(message);
-    socket.emit("message", message);
+    io.emit('message',(message));
+    // socket.emit("message", message);
   });
 
   socket.on("user", function(user: any) {
     console.log(user);
     const message = user + " has entered.";
-    socket.broadcast.emit("entrance", message);
+    io.emit("entrance", message);
   });
 });
 
@@ -88,19 +97,21 @@ app.listen(API_PORT, ()=> {
 
 const sampleCheck = (req: express.Request, res:express.Response, next: express.NextFunction) => {
   console.log("Here");
-  res.status(200).json({message: "token verified"});
+  res.status(200).json({message: "token verified", user: res.locals.user});
 }
 
 const verifyToken = (req: express.Request, res:express.Response, next: express.NextFunction) => {
   try {
     console.log(req.cookies);
     const clientToken: string = req.cookies.user;
-    const decoded: string | object = jwt.verify(clientToken, jwt_secret);
-  
+    const decoded = jwt.verify(clientToken, jwt_secret);
     console.log(decoded);
-    if (typeof decoded === 'object' &&  decoded !== null) {
+
+    if (decoded !== undefined) {
       console.log("cookie came in");
       console.log(decoded);
+      res.locals.user = (decoded as tokenObject).username;
+      console.log(res.locals);
       next();
     }
   }catch (error) {

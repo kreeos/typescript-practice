@@ -9,6 +9,7 @@ const baseUrl: string = devUrl ?? "";
 
 const Home: React.FC = () => {
     const [isLoggedIn, setLoggedIn] = useState(false);
+    const [username, setUsername] = useState("");
 
     useEffect(() => {
         biseoAxios.get(baseUrl+"/verifyToken").
@@ -16,9 +17,12 @@ const Home: React.FC = () => {
             console.log(response);
             if (response.status == 200) {
                 setLoggedIn(true);
+                setUsername(response.data.user);
             }
         })
         .catch((error) => {
+            setLoggedIn(false);
+            setUsername("");
             console.log(error);
         });
     });
@@ -28,7 +32,7 @@ const Home: React.FC = () => {
             {
             isLoggedIn ?
             <div>
-                <Chat username={undefined}/>
+                <Chat username={username}/>
             </div>
             :   
             <div className="form-container">
