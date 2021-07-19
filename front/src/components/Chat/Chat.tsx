@@ -1,8 +1,8 @@
 import React, { useState, useEffect, MouseEventHandler } from 'react';
 import { biseoAxios } from '../../lib/biseoAxios';
-import { SOCKET_URL } from '../../lib/config';
+import { socket } from "../../lib/socket";
 import LogoutButton from '../Login/LogoutButton';
-import io from "socket.io-client";
+
 import './chat.css';
 const devUrl = "http://localhost:9000/api"
 // const devUrl = undefined;
@@ -12,7 +12,9 @@ interface ChatUsernameProps {
   username: string | undefined;
 }
 
-const socket =  io(SOCKET_URL);
+interface userListInterface {
+    [username: string] : string;
+}
 
 const Chat: React.FC<ChatUsernameProps> = props => {
     const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
@@ -48,22 +50,21 @@ const Chat: React.FC<ChatUsernameProps> = props => {
         }
     });
 
-    const sendMsg = () => {
-        socket.emit("message", {user: username, message: chatMessage});
-        setChatMessage("");
-    }
-
-    socket.on("message", function(message: any) {
-        console.log(message);
-    })
-
-    socket.on('message',({user,message})=>{
+    socket.on('message',( {user, message})=>{
         setChats([...chats,{user, message}])
     })
     
-    socket.on("entrance", function(message: any) {
+    socket.on("entrance", ({userList, message})=>{
         console.log(message);
+        console.log(userList);
+        const user:string = "";
+        setChats([...chats,{user, message}])
     })
+    const sendMsg = () => {
+        // socket.emit("message", {user: username, message: chatMessage});
+        setChatMessage("");
+    }
+
 
     const renderChat =()=>{
         return chats.map(({user, message},index)=>(

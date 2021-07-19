@@ -26,6 +26,10 @@ export interface tokenObject {
   exp: number,
 }
 
+export interface userList {
+  [username: string] : string;
+}
+
 const app: express.Application = express();
 const API_PORT: number = 9000;
 const saltRounds: number = 10;
@@ -33,9 +37,13 @@ const jwt_secret: string = process.env.JWT_SECRET ? process.env.JWT_SECRET : "de
 let http = require("http").Server(app);
 const io = socket(http);
 
+let userList: userList = {};
+
+
 const server = http.listen(3000, function() {
   console.log("listening on *:3000");
 });
+
 
 io.on('connection', (socket: any) => {
   console.log('a user is connected');
@@ -52,8 +60,11 @@ io.on('connection', (socket: any) => {
 
   socket.on("user", function(user: any) {
     console.log(user);
-    const message = user + " has entered.";
-    io.emit("entrance", message);
+    if (userList[user] !== undefined) {
+      const message = user + " has entered.";
+      io.emit("entrance", {userList, message});
+    }
+    userList[user] = socket.id;
   });
 });
 
