@@ -20,7 +20,7 @@ const LogoutButton: React.FC = () => {
     };
 
     return (
-        <div className="home">
+        <div>
           <button onClick={LogoutClick}>
             Log Out
           </button>

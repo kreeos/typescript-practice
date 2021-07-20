@@ -8,10 +8,16 @@ const devUrl = "http://localhost:9000/api"
 // const devUrl = undefined;
 const baseUrl: string = devUrl ?? "";
 
-const LoginForm: React.FC = () => {
+interface LoginProps {
+    socket: any;
+  }
+
+const LoginForm: React.FC<LoginProps> = props => {
     const { register, handleSubmit, watch, formState: {errors} } = useForm();
     const [username, setUsername] = useState<string>("");
     const [isLoggedIn, setLoggedIn] = useState<boolean>(false);
+    const socket = props.socket;
+
     const onSubmit = (data: JSON) => {
         // window.location.href = baseUrl+'/login'
         biseoAxios.post(baseUrl+"/login", data)
@@ -38,7 +44,7 @@ const LoginForm: React.FC = () => {
         <div>
             {
             isLoggedIn ?
-            <Chat username={username}/>
+            <Chat socket={socket} username={username}/>
             :
             <div>
                 <Form onSubmit={handleSubmit(onSubmit)}>

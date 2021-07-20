@@ -7,9 +7,14 @@ const devUrl = "http://localhost:9000/api"
 // const devUrl = undefined;
 const baseUrl: string = devUrl ?? "";
 
-const Home: React.FC = () => {
+interface HomeProps {
+    socket: any;
+  }
+
+const Home: React.FC<HomeProps> = props => {
     const [isLoggedIn, setLoggedIn] = useState(false);
     const [username, setUsername] = useState("");
+    const socket = props.socket;
 
     useEffect(() => {
         biseoAxios.get(baseUrl+"/verifyToken").
@@ -32,11 +37,11 @@ const Home: React.FC = () => {
             {
             isLoggedIn ?
             <div>
-                <Chat username={username}/>
+                <Chat socket={socket} username={username}/>
             </div>
             :   
             <div className="form-container">
-                <LoginForm/>
+                <LoginForm socket={socket}/>
             </div>
             }
         </div>

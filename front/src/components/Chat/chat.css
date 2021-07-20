@@ -6,3 +6,17 @@
   display: flex;
   flex-direction: column;
 }
+
+.chatBox {
+  width: 100vw;
+  height: 50vh;
+}
+
+.userList {
+  width: 25%;
+}
+
+.chatList {
+  width: 70%;
+  margin-left: 5%;
+}

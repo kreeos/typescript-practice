@@ -9,6 +9,7 @@ import Chat from './components/Chat';
 import Home from './components/Home';
 import Register from './components/Register';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { socket } from "./lib/socket";
 
 const App: React.FC = () =>{
   return (
@@ -35,13 +36,13 @@ const App: React.FC = () =>{
             <Users />
           </Route> */}
           <Route exact path="/">
-            <Home />
+            <Home socket={socket}/>
           </Route>
           <Route exact path="/register">
-            <Register />
+            <Register/>
           </Route>
           <Route exact path="/chat">
-            <Chat username={undefined}/>
+            <Chat username={undefined} socket={socket}/>
           </Route>
         </Switch>
       </div>
